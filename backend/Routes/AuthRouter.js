@@ -11,6 +11,8 @@ const RefreshTokenController = require('../Controllers/RefreshTokenController')
 // MIDDLEWARE
 const authenticateToken = require('../Middleware/authenticateToken')
 
+
+// ROUTES
 Router.get('/test', authenticateToken, TestTokenController)
 Router.post('/token', LoginController)
 Router.post('/refresh_token', RefreshTokenController)
