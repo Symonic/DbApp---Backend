@@ -14,7 +14,7 @@ const LoginRouter = require('./Routes/AuthRouter')
 
 // MIDDLEWARE
 app.use(express.json())
-app.use(cors({origin: "https://front-rose-ten.vercel.app"}))
+app.use(cors({origin: "http://localhost:3000"}))
 
 // PATHS
 app.use('/auth', LoginRouter)
