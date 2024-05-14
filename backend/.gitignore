@@ -1,5 +1,4 @@
 /node_modules
 test.rest
 .vercel
-.env
 compose.yml
