@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const {Blacklist_refresh_token} = require('../Models/models')
+const {Blacklist_refresh_token,User} = require('../Models/models')
 require('dotenv').config()
 
 const authenticateToken = async (req, res, next) => {
@@ -22,7 +22,9 @@ const authenticateToken = async (req, res, next) => {
         console.log(err)
         if(err) return res.sendStatus(403)
 
+        
         req.user = user
+        //console.log('authenticated user', req.user);
         next()
     })
 

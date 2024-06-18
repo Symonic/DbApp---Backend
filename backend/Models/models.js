@@ -32,7 +32,7 @@ User.init(
             allowNull: false
         },
         role: {
-            type: DataTypes.STRING,
+            type: DataTypes.ENUM('Player', 'Coach', 'Admin'),
             allowNull: false
         },
         is_active: {
@@ -82,12 +82,6 @@ Refresh_token.init(
             type: DataTypes.STRING,
             allowNull: true
         },
-        id:{
-            type:DataTypes.INTEGER,
-            allowNull:false,
-            primaryKey:true,
-            autoIncrement:true
-        }
     },
     {
         sequelize,
@@ -179,7 +173,7 @@ Events.init(
 class Player_answers extends Model{}
 Player_answers.init(
     {
-        question_id:{
+        questionnare_id:{
             type: DataTypes.INTEGER,
             allowNull:false,
             primaryKey:true
@@ -189,13 +183,21 @@ Player_answers.init(
             allowNull:false,
             primaryKey:true
         },
-        string_answer:{
-            type:DataTypes.TEXT,
-            allowNull:true
-        },
-        numeric_answer:{
+        mental_condition:{
             type:DataTypes.INTEGER,
             allowNull:true
+        },
+        physical_condition:{
+            type:DataTypes.INTEGER,
+            allowNull:true
+        },
+        motivation: {
+            type:DataTypes.INTEGER,
+            allowNull: true
+        },
+        injuries: {
+            type: DataTypes.STRING,
+            allowNull: true
         }
     },
     {
@@ -215,11 +217,11 @@ Players.init(
             type: DataTypes.DATE,
             allowNull:true
         },
-        heigth:{
+        height:{
             type:DataTypes.INTEGER,
             allowNull:true
         },
-        weigth:{
+        weight:{
             type:DataTypes.INTEGER,
             allowNull:true
         },
@@ -242,22 +244,25 @@ Players.init(
     }
 
 )
+
+
+
 class Positions extends Model {}
 Positions.init(
     {
-        player_id:{
+        position_id:{
             type: DataTypes.INTEGER,
             allowNull:false,
             primaryKey:true
         },
-        position:{
+        position_code:{
             type: DataTypes.ENUM('BR','LO','ŚO','PO','CLS','CPS','LP','ŚP','PP','ŚPD','ŚPO','LS','PS','ŚN','N'),
             allowNull:true,
             primaryKey:true
         },
-        pos_strength:{
-            type:DataTypes.ENUM('Preferowana', 'Grywalna'),
-            allowNull:true
+        full_name:{
+            type: DataTypes.STRING(50),
+            allowNull:false ,
         },
     },
     {
@@ -266,6 +271,39 @@ Positions.init(
     }
 
 )
+
+class Player_positions extends Model{}
+Player_positions.init(
+    {
+        player_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: true,
+            // references: {
+            //     model: Players,
+            //     key: 'id'
+            // }
+        },
+        position_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: true,
+            // references: {
+            //     model: Positions,
+            //     key: 'position_id' 
+            // }
+        },
+        pos_strength: {
+            type: DataTypes.ENUM('Preferowana', 'Grywalna'), 
+            allowNull: false
+        }
+        },
+    {
+        sequelize,
+         modelName: 'player_positions',   
+    }
+) 
+
 class Player_stats extends Model {}
 Player_stats.init(
     {
@@ -340,10 +378,6 @@ Questionnares.init(
             type: DataTypes.INTEGER,
             allowNull:true,
         },
-        title:{
-            type:DataTypes.STRING,
-            allowNull:true
-        }
     },
     {
         sequelize,
@@ -351,30 +385,8 @@ Questionnares.init(
     }
 
 )
-class Questions extends Model {}
-Questions.init(
-    {
-        id:{
-            type: DataTypes.INTEGER,
-            allowNull:false,
-            primaryKey:true,
-            autoIncrement: true
-        },
-        question:{
-            type: DataTypes.TEXT,
-            allowNull:false,
-        },
-        questionnare_id:{
-            type:DataTypes.INTEGER,
-            allowNull:true
-        }
-    },
-    {
-        sequelize,
-        modelName:'questions'
-    }
 
-)
+
 class Rented_equipments extends Model {}
 Rented_equipments.init(
     {
@@ -383,22 +395,51 @@ Rented_equipments.init(
             allowNull:false,
             primaryKey:true
         },
-        equipment:{
+        equipment_id:{
             type: DataTypes.STRING,
             allowNull:false,
             primaryKey:true
         },
         rent_date:{
             type:DataTypes.DATE,
-            allowNull:false
+            allowNull:true
         }
     },
     {
         sequelize,
         modelName:'rented_equipments'
     }
-
 )
+class Equipment extends Model {}
+Equipment.init(
+    {
+        id:{
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: true,
+            autoIncrement: true
+        },
+        descr:{
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        available:{
+            type: DataTypes.INTEGER,
+            allowNull: true
+        },
+        team_id:{
+            type: DataTypes.INTEGER,
+            allowNull: false,
+
+        }
+    },
+    {
+        sequelize,
+        modelName: 'equipments'
+    }
+)
+
+
 class Seasons extends Model {}
 Seasons.init(
     {
@@ -498,6 +539,39 @@ Team_stats.init(
 
 )
 
+class Create_user_token extends Model{}
+Create_user_token.init(
+    {
+        id:{
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: true,
+            autoIncrement: true
+        },
+        expire_date:{
+            type: DataTypes.TIME,
+            allowNull: false,
+        },
+        role: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        token: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        team_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        }
+    },
+    {
+        sequelize,
+        modelName: 'create_user_token',
+        tableName: 'create_user_token'
+    }
+)
+
 // RELATIONS
 
 User.hasOne(Players, {
@@ -506,6 +580,13 @@ User.hasOne(Players, {
 Players.belongsTo(User, {
     foreignKey: 'id'
 })
+
+User.hasOne(Teams, { 
+    foreignKey: 'coach_id'
+ });
+Teams.belongsTo(User, { 
+    foreignKey: 'coach_id', as: 'coach'
+ });
 
 Teams.hasMany(Players, {
     foreignKey: 'team_id'
@@ -533,6 +614,95 @@ Players.hasMany(Player_stats,{
 Player_stats.belongsTo(Players, {
     foreignKey: 'player_id'
 })
+Teams.hasMany(Events,{
+    foreignKey: 'teams_id'
+})
+Events.belongsTo(Teams, {
+    foreignKey:'teams_id'
+})
+Events.hasMany(Event_players, {
+    foreignKey: 'event_id'
+})
+Event_players.belongsTo(Events,{
+    foreignKey: 'event_id'
+})
+Players.belongsToMany(Positions, { 
+    through: Player_positions,
+    foreignKey: 'player_id'
+});
 
-module.exports = {User, Refresh_token, Event_players,Events,Player_answers,Players, Positions, Player_stats,Questionnares,Questions, Rented_equipments,Seasons, Teams,Team_stats, Blacklist_refresh_token}
+Positions.belongsToMany(Players, { 
+    through: Player_positions, 
+    foreignKey: 'position_id' 
+});
+
+Players.hasMany(Player_positions, {
+    foreignKey: 'player_id' 
+});
+Player_positions.belongsTo(Players, { 
+    foreignKey: 'player_id' 
+});
+
+Positions.hasMany(Player_positions, { 
+    foreignKey: 'position_id' 
+});
+Player_positions.belongsTo(Positions, { 
+    foreignKey: 'position_id' 
+});
+
+
+Teams.hasOne(Questionnares, {
+    foreignKey: 'team_id'
+})
+Questionnares.belongsTo(Teams, {
+    foreignKey: 'team_id'
+})
+
+Questionnares.hasMany(Player_answers, {
+    foreignKey: 'questionnare_id'
+})
+Player_answers.belongsTo( Questionnares, {
+    foreignKey: 'questionnare_id'
+})
+Players.hasOne(Player_answers, {
+    foreignKey: 'player_id'
+})
+Player_answers.belongsTo(Players, {
+    foreignKey: 'player_id'
+})
+
+Players.hasMany(Rented_equipments, {
+    foreignKey: 'player_id'
+})
+
+Rented_equipments.belongsTo(Players, {
+    foreignKey: 'player_id'
+})
+
+
+
+Teams.hasMany(Equipment, {
+    foreignKey: 'team_id'
+})
+Equipment.belongsTo(Teams, {
+    foreignKey: 'team_id'
+})
+
+// // // In Positions model
+// Players.hasMany(Event_players, {
+//     foreignKey: 'player_id'
+// })
+// Event_players.belongsTo(Players, {
+//     foreignKey: 'player_id'
+// })
+
+
+
+
+
+
+
+
+module.exports = {User, Refresh_token, Event_players,Events,Player_answers,Players, Positions, Player_positions, Player_stats,Questionnares, Rented_equipments, Equipment, Seasons, Teams,Team_stats, Blacklist_refresh_token, Create_user_token}
+
 

@@ -9,7 +9,7 @@ const Login = async (req,res) => {
     try{
         console.log(req.body.username)
         const searched_user = await User.findAll({
-            attributes: ['username'], 
+            attributes: ['username', 'role'], 
             where: {
                 username: `${req.body.username}`,
                 password: `${req.body.password}`
@@ -27,7 +27,7 @@ const Login = async (req,res) => {
                     tokens: `${refreshToken}`,
                 })
                 // await client.query(`INSERT INTO refresh_tokens(token) VALUES('${refreshToken}')`)
-                res.json({"access":accessToken, "refresh":refreshToken})
+                res.json({"access":accessToken, "refresh":refreshToken, "role":searched_user[0].role})
 
             } catch (error) {
                 res.json({"detail":error})

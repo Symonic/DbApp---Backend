@@ -16,7 +16,7 @@ const TeamInfoController = async (req, res) => {
               }
             },
             where: {
-              username: 'JC'
+              username: req.user.name
             }
           })
           .then(async user => {
@@ -40,16 +40,7 @@ const TeamInfoController = async (req, res) => {
             }
 
           })
-
-        // if(team_info.length != 0){
-
-        //     //const coach_id = team_info.teams.coach_id
-        //     //console.log(team_info.users)
-
-        //     return res.json({team_info:team_info})
-        // }
-
-        
+   
     } catch (error) {
         return res.json({'detail':error})
     }

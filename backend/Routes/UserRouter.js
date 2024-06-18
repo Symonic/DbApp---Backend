@@ -10,6 +10,7 @@ const UserStatisticsController = require('../Controllers/UserControllers/UserSta
 // MIDDLEWARE
 const authenticateToken = require('../Middleware/authenticateToken')
 
+// ROUTES
 Router.get('/', authenticateToken, UserStatsViewController)
 Router.get('/info', authenticateToken, UserInfoController)
 Router.get('/statistics', authenticateToken,UserStatisticsController)
